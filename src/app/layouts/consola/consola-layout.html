@@ -1,0 +1,67 @@
+<div class="consola" [class.menu-abierto]="menuAbierto()">
+  <aside class="barra-lateral">
+    <div class="marca">
+      <span class="marca-punto" aria-hidden="true"></span>
+      <span class="marca-nombre">{{ marca().nombre }}</span>
+    </div>
+
+    <nav class="navegacion" aria-label="Secciones de la consola">
+      @for (entrada of menu(); track entrada.ruta) {
+        <a
+          class="enlace"
+          [routerLink]="entrada.ruta"
+          routerLinkActive="activo"
+          [routerLinkActiveOptions]="{ exact: entrada.ruta === '/consola' }"
+          (click)="cerrarMenu()"
+        >
+          <span class="icono" aria-hidden="true">{{ entrada.icono }}</span>
+          {{ entrada.etiqueta }}
+        </a>
+      }
+    </nav>
+
+    <div class="pie-lateral">
+      <span class="etiqueta">Fase 0</span>
+      <p class="tenue">Consola del centro</p>
+    </div>
+  </aside>
+
+  <div class="area">
+    <header class="cabecera">
+      <button
+        type="button"
+        class="boton-menu"
+        (click)="alternarMenu()"
+        [attr.aria-expanded]="menuAbierto()"
+        aria-label="Abrir o cerrar el menu"
+      >
+        ☰
+      </button>
+
+      <div class="cabecera-titulo">
+        <strong>{{ marca().nombre }}</strong>
+        <span class="tenue">Consola</span>
+      </div>
+
+      @if (usuario(); as u) {
+        <div class="usuario">
+          <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+          <span class="usuario-datos">
+            <strong>{{ u.nombreCompleto }}</strong>
+            <small class="tenue">{{ u.rol }}</small>
+          </span>
+          <button type="button" class="boton boton-secundario" (click)="salir()">Salir</button>
+        </div>
+      }
+    </header>
+
+    <main class="contenido">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Capa que cierra el menu al tocar fuera, solo en pantallas pequenas -->
+  @if (menuAbierto()) {
+    <button type="button" class="velo" (click)="cerrarMenu()" aria-label="Cerrar el menu"></button>
+  }
+</div>

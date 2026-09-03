@@ -1,0 +1,31 @@
+<div class="aula">
+  <header class="barra">
+    <div class="barra-interior">
+      <a class="marca" routerLink="/aula">
+        <span class="marca-punto" aria-hidden="true"></span>
+        <span>{{ marca().nombre }}</span>
+      </a>
+
+      <nav class="navegacion" aria-label="Secciones del aula">
+        <a routerLink="/aula" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">
+          Mis cursos
+        </a>
+        <a routerLink="/aula/clases" routerLinkActive="activo">Mis clases</a>
+        <a routerLink="/aula/pagos" routerLinkActive="activo">Mis pagos</a>
+        <a routerLink="/aula/certificados" routerLinkActive="activo">Certificados</a>
+      </nav>
+
+      @if (usuario(); as u) {
+        <div class="usuario">
+          <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+          <span class="nombre">{{ u.nombreCompleto }}</span>
+          <button type="button" class="boton boton-secundario" (click)="salir()">Salir</button>
+        </div>
+      }
+    </div>
+  </header>
+
+  <main class="contenido">
+    <router-outlet />
+  </main>
+</div>

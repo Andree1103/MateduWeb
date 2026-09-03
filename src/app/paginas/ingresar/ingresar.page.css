@@ -1,0 +1,60 @@
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 30px 28px 32px;
+}
+
+.encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.marca-punto {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 6px;
+  background: var(--marca-primario);
+  border-radius: 7px;
+}
+
+.encabezado h1 {
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.encabezado p {
+  margin: 0;
+  font-size: 14px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+form .boton {
+  margin-top: 4px;
+  width: 100%;
+  padding: 11px 18px;
+}
+
+.aviso-error {
+  margin: 0 0 16px;
+}
+
+.pie {
+  font-size: 12.5px;
+}

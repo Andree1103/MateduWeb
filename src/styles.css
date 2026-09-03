@@ -1,0 +1,207 @@
+/* =====================================================================
+   MATEDU · estilos base
+   Todo el color pasa por variables. En la fase 6, cuando cada centro traiga
+   su propia marca, solo cambia --marca-primario y la interfaz entera se
+   adapta sin tocar componentes.
+   ===================================================================== */
+
+:root {
+  /* Color del centro. MarcaService lo sobrescribe en tiempo de ejecucion. */
+  --marca-primario: #0e6e76;
+  --marca-primario-suave: rgba(14, 110, 118, 0.12);
+
+  /* Superficies y texto */
+  --fondo: #eff2f4;
+  --superficie: #ffffff;
+  --superficie-2: #f7f9fa;
+  --texto: #14202c;
+  --texto-2: #3c4c5c;
+  --texto-tenue: #6a7a8a;
+  --linea: #d9e1e7;
+  --linea-2: #e9eef1;
+
+  /* Semanticos */
+  --exito: #2c8a68;
+  --aviso: #b0702a;
+  --error: #b3382f;
+  --error-suave: #fdecea;
+
+  --sombra: 0 1px 2px rgba(20, 32, 44, 0.05), 0 8px 24px -14px rgba(20, 32, 44, 0.22);
+  --radio: 8px;
+  --radio-sm: 5px;
+
+  --fuente: 'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fuente-mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #0e151c;
+    --superficie: #161f29;
+    --superficie-2: #1b2631;
+    --texto: #e6ecf1;
+    --texto-2: #b9c6d2;
+    --texto-tenue: #8496a6;
+    --linea: #2a3846;
+    --linea-2: #222e3a;
+
+    --exito: #4cbb92;
+    --aviso: #e29a48;
+    --error: #e0736a;
+    --error-suave: #2c1a18;
+
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -16px rgba(0, 0, 0, 0.7);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+a {
+  color: var(--marca-primario);
+}
+
+/* --------------------------------------------------------------- controles */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--texto-2);
+  letter-spacing: 0.02em;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-sm);
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: var(--marca-primario);
+  box-shadow: 0 0 0 3px var(--marca-primario-suave);
+}
+
+.campo .ayuda {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.campo .error-campo {
+  font-size: 12px;
+  color: var(--error);
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--marca-primario);
+  border: 1px solid transparent;
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+}
+
+.boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.boton-secundario {
+  color: var(--texto-2);
+  background: transparent;
+  border-color: var(--linea);
+}
+
+.boton:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--marca-primario);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------- bloques */
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.aviso-error {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--error);
+  background: var(--error-suave);
+  border: 1px solid var(--error);
+  border-radius: var(--radio-sm);
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 2px 9px;
+  font-family: var(--fuente-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--marca-primario);
+  background: var(--marca-primario-suave);
+  border-radius: 99px;
+}
+
+.tenue {
+  color: var(--texto-tenue);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
