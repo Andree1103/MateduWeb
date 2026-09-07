@@ -1,59 +1,62 @@
 <div class="consola" [class.menu-abierto]="menuAbierto()">
-  <aside class="barra-lateral">
-    <div class="marca">
+  <header class="barra-superior">
+    <button
+      type="button"
+      class="boton-menu"
+      (click)="alternarMenu()"
+      [attr.aria-expanded]="menuAbierto()"
+      aria-label="Abrir o cerrar el menu"
+    >
+      <span aria-hidden="true">☰</span>
+    </button>
+
+    <a class="marca" routerLink="/consola">
       <span class="marca-punto" aria-hidden="true"></span>
       <span class="marca-nombre">{{ marca().nombre }}</span>
-    </div>
+    </a>
 
-    <nav class="navegacion" aria-label="Secciones de la consola">
-      @for (entrada of menu(); track entrada.ruta) {
-        <a
-          class="enlace"
-          [routerLink]="entrada.ruta"
-          routerLinkActive="activo"
-          [routerLinkActiveOptions]="{ exact: entrada.ruta === '/consola' }"
-          (click)="cerrarMenu()"
-        >
-          <span class="icono" aria-hidden="true">{{ entrada.icono }}</span>
-          {{ entrada.etiqueta }}
-        </a>
-      }
-    </nav>
+    <span class="barra-separador" aria-hidden="true"></span>
+    <span class="barra-seccion">Consola</span>
 
-    <div class="pie-lateral">
-      <span class="etiqueta">Fase 0</span>
-      <p class="tenue">Consola del centro</p>
-    </div>
-  </aside>
-
-  <div class="area">
-    <header class="cabecera">
-      <button
-        type="button"
-        class="boton-menu"
-        (click)="alternarMenu()"
-        [attr.aria-expanded]="menuAbierto()"
-        aria-label="Abrir o cerrar el menu"
-      >
-        ☰
-      </button>
-
-      <div class="cabecera-titulo">
-        <strong>{{ marca().nombre }}</strong>
-        <span class="tenue">Consola</span>
-      </div>
-
+    <div class="barra-derecha">
       @if (usuario(); as u) {
-        <div class="usuario">
-          <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
-          <span class="usuario-datos">
-            <strong>{{ u.nombreCompleto }}</strong>
-            <small class="tenue">{{ u.rol }}</small>
-          </span>
-          <button type="button" class="boton boton-secundario" (click)="salir()">Salir</button>
-        </div>
+        <span class="usuario-datos">
+          <strong>{{ u.nombreCompleto }}</strong>
+          <small>{{ u.rol }}</small>
+        </span>
+        <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+        <button type="button" class="salir" (click)="salir()">Salir</button>
       }
-    </header>
+    </div>
+  </header>
+
+  <div class="cuerpo">
+    <aside class="barra-lateral">
+      <nav class="navegacion" aria-label="Secciones de la consola">
+        @for (bloque of menu(); track bloque.titulo) {
+          <div class="bloque">
+            @if (bloque.titulo) {
+              <p class="bloque-titulo">{{ bloque.titulo }}</p>
+            }
+            @for (entrada of bloque.entradas; track entrada.ruta) {
+              <a
+                class="enlace"
+                [routerLink]="entrada.ruta"
+                routerLinkActive="activo"
+                [routerLinkActiveOptions]="{ exact: entrada.ruta === '/consola' }"
+                (click)="cerrarMenu()"
+              >
+                {{ entrada.etiqueta }}
+              </a>
+            }
+          </div>
+        }
+      </nav>
+
+      <div class="pie-lateral">
+        <p class="tenue">{{ marca().nombre }}</p>
+      </div>
+    </aside>
 
     <main class="contenido">
       <router-outlet />

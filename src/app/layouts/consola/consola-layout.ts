@@ -7,8 +7,14 @@ import { MarcaService } from '../../core/tenant/marca.service';
 interface EntradaMenu {
   etiqueta: string;
   ruta: string;
-  icono: string;
+  /** Bloque del menu al que pertenece. Vacio = suelta, arriba del todo. */
+  grupo: string;
   roles: Rol[];
+}
+
+interface BloqueMenu {
+  titulo: string;
+  entradas: EntradaMenu[];
 }
 
 /**
@@ -32,25 +38,63 @@ export class ConsolaLayout {
   protected readonly marca = this.marcaService.marca;
   protected readonly menuAbierto = signal(false);
 
+  /**
+   * El menu, agrupado por el trabajo que se hace, no por como esta hecho
+   * el sistema por dentro. Trece enlaces seguidos se leen como una lista de
+   * la compra; en cuatro bloques, quien busca "cobranza" mira solo el bloque
+   * del dinero.
+   *
+   * Sin iconos a proposito: trece simbolos geometricos distintos no ayudan a
+   * distinguir nada —nadie asocia un rombo con la cobranza— y ensucian una
+   * columna donde la palabra ya dice exactamente lo que hay.
+   */
   private readonly entradas: EntradaMenu[] = [
-    { etiqueta: 'Inicio', ruta: '/consola', icono: '◧', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
-    { etiqueta: 'Cursos', ruta: '/consola/cursos', icono: '▤', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
-    { etiqueta: 'Grupos', ruta: '/consola/grupos', icono: '◫', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
-    { etiqueta: 'Alumnos', ruta: '/consola/alumnos', icono: '◎', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
-    { etiqueta: 'Evaluaciones', ruta: '/consola/examenes', icono: '✎', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
-    { etiqueta: 'Cobranza', ruta: '/consola/cobranza', icono: '◈', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
-    { etiqueta: 'Cobros online', ruta: '/consola/cobros', icono: '▣', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
-    { etiqueta: 'Reportes', ruta: '/consola/reportes', icono: '▦', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
-    { etiqueta: 'Avisos', ruta: '/consola/avisos', icono: '✉', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
-    { etiqueta: 'Videoconferencia', ruta: '/consola/videoconferencia', icono: '▷', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
-    { etiqueta: 'Mi centro', ruta: '/consola/centro', icono: '◐', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
-    { etiqueta: 'Equipo', ruta: '/consola/equipo', icono: '◉', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
-    { etiqueta: 'Plan', ruta: '/consola/plan', icono: '◆', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+    { etiqueta: 'Inicio', ruta: '/consola', grupo: '', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
+
+    { etiqueta: 'Cursos', ruta: '/consola/cursos', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
+    { etiqueta: 'Grupos', ruta: '/consola/grupos', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
+    { etiqueta: 'Alumnos', ruta: '/consola/alumnos', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
+    { etiqueta: 'Evaluaciones', ruta: '/consola/examenes', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
+
+    { etiqueta: 'Cobranza', ruta: '/consola/cobranza', grupo: 'Dinero', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
+    { etiqueta: 'Cobros online', ruta: '/consola/cobros', grupo: 'Dinero', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+
+    { etiqueta: 'Reportes', ruta: '/consola/reportes', grupo: 'Operacion', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
+    { etiqueta: 'Avisos', ruta: '/consola/avisos', grupo: 'Operacion', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+    { etiqueta: 'Videoconferencia', ruta: '/consola/videoconferencia', grupo: 'Operacion', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+
+    { etiqueta: 'Mi centro', ruta: '/consola/centro', grupo: 'Configuracion', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+    { etiqueta: 'Equipo', ruta: '/consola/equipo', grupo: 'Configuracion', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
+    { etiqueta: 'Plan', ruta: '/consola/plan', grupo: 'Configuracion', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },
   ];
 
-  protected readonly menu = computed(() => {
+  /**
+   * El menu del rol, ya agrupado.
+   *
+   * Un bloque que se queda sin entradas visibles no se muestra: un docente no
+   * tiene por que ver un titulo "Dinero" con nada debajo.
+   */
+  protected readonly menu = computed<BloqueMenu[]>(() => {
     const rol = this.auth.rol();
-    return rol === null ? [] : this.entradas.filter((entrada) => entrada.roles.includes(rol));
+    if (rol === null) {
+      return [];
+    }
+
+    const bloques: BloqueMenu[] = [];
+    for (const entrada of this.entradas) {
+      if (!entrada.roles.includes(rol)) {
+        continue;
+      }
+
+      const ultimo = bloques[bloques.length - 1];
+      if (ultimo && ultimo.titulo === entrada.grupo) {
+        ultimo.entradas.push(entrada);
+      } else {
+        bloques.push({ titulo: entrada.grupo, entradas: [entrada] });
+      }
+    }
+
+    return bloques;
   });
 
   protected alternarMenu(): void {

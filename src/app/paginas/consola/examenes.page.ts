@@ -5,6 +5,8 @@ import {
   CursoResumen,
   ExamenResumen,
   PreguntaDetalle,
+  TipoExamen,
+  TipoExamenDisponible,
   TipoPregunta,
 } from '../../core/api/api.models';
 import { MateduApi } from '../../core/api/matedu.api';
@@ -80,12 +82,32 @@ import { MateduApi } from '../../core/api/matedu.api';
               />
             </label>
             <label>
+              <span>Tipo</span>
+              <select
+                name="tipoExamen"
+                [ngModel]="tipoExamen()"
+                (ngModelChange)="cambiarTipoExamen($event)"
+              >
+                @for (opcion of tiposDeExamen(); track opcion.tipo) {
+                  <option [value]="opcion.tipo">{{ opcion.etiqueta }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              <span>Peso</span>
+              <input type="number" name="peso" min="1" [(ngModel)]="peso" />
+            </label>
+            <label>
               <span>Minutos</span>
               <input type="number" name="minutos" min="1" [(ngModel)]="minutosLimite" />
             </label>
             <label>
               <span>Intentos</span>
               <input type="number" name="intentos" min="1" [(ngModel)]="intentos" />
+            </label>
+            <label class="interruptor">
+              <input type="checkbox" name="cuenta" [(ngModel)]="cuentaParaNota" />
+              <span>Cuenta para la nota</span>
             </label>
             <label class="interruptor">
               <input type="checkbox" name="aleatorio" [(ngModel)]="aleatorizar" />
@@ -95,6 +117,11 @@ import { MateduApi } from '../../core/api/matedu.api';
               Crear examen
             </button>
           </form>
+          <p class="tenue nota">
+            El tipo trae su peso habitual ya puesto —un final pesa el triple que un test— y
+            usted puede cambiarlo. Una <strong>practica</strong> nace sin contar para la
+            nota: existe para que el alumno se equivoque sin consecuencias.
+          </p>
           <p class="tenue nota">
             Con el orden aleatorio, cada alumno ve las preguntas en un orden distinto. Dentro
             de un mismo intento el orden no cambia, así que recargar la página no le
@@ -107,11 +134,14 @@ import { MateduApi } from '../../core/api/matedu.api';
             <div class="datos">
               <strong>{{ examen.titulo }}</strong>
               <small class="tenue">
+                {{ examen.tipoEtiqueta }} · peso {{ examen.peso }} ·
                 {{ examen.totalPreguntas }} pregunta(s)
                 @if (examen.minutosLimite) {
                   · {{ examen.minutosLimite }} min
                 }
-                · {{ examen.intentosPermitidos }} intento(s)
+                @if (!examen.cuentaParaNota) {
+                  · <span class="no-cuenta">no cuenta para la nota</span>
+                }
               </small>
             </div>
             @if (examen.publicado) {
@@ -388,6 +418,9 @@ import { MateduApi } from '../../core/api/matedu.api';
       background: rgba(150, 150, 150, 0.16);
       color: var(--texto-tenue);
     }
+    .no-cuenta {
+      color: var(--aviso);
+    }
     .estado.publicado {
       background: rgba(22, 130, 90, 0.14);
       color: #12805a;
@@ -510,6 +543,8 @@ export class ConsolaExamenesPage implements OnInit {
   readonly cursos = signal<CursoResumen[]>([]);
   readonly cursoId = signal<string>('');
   readonly examenes = signal<ExamenResumen[]>([]);
+  readonly tiposDeExamen = signal<TipoExamenDisponible[]>([]);
+  readonly tipoExamen = signal<TipoExamen>('TEST');
   readonly examenActivoId = signal<string | null>(null);
   readonly preguntas = signal<PreguntaDetalle[]>([]);
   readonly creandoExamen = signal(false);
@@ -528,6 +563,8 @@ export class ConsolaExamenesPage implements OnInit {
   minutosLimite: number | null = 30;
   intentos = 1;
   aleatorizar = true;
+  peso = 1;
+  cuentaParaNota = true;
 
   readonly examenActivo = computed(
     () => this.examenes().find((examen) => examen.id === this.examenActivoId()) ?? null,
@@ -538,6 +575,29 @@ export class ConsolaExamenesPage implements OnInit {
       next: (pagina) => this.cursos.set(pagina.content),
       error: () => this.error.set('No se pudieron cargar los cursos.'),
     });
+
+    this.api.tiposDeExamen().subscribe({
+      next: (tipos) => this.tiposDeExamen.set(tipos),
+      error: () => this.error.set('No se pudieron cargar los tipos de examen.'),
+    });
+  }
+
+  /**
+   * Al cambiar el tipo se traen su peso y su "cuenta para la nota".
+   *
+   * Es una propuesta, no una imposicion: quedan en los campos y el docente
+   * puede pisarlos antes de crear. Sin esto habria que acordarse de poner 3 en
+   * cada final y 1 en cada practica, y el dia que a alguien se le olvide un
+   * final pesara lo mismo que un test sin que nadie lo note.
+   */
+  cambiarTipoExamen(tipo: TipoExamen): void {
+    this.tipoExamen.set(tipo);
+
+    const ficha = this.tiposDeExamen().find((opcion) => opcion.tipo === tipo);
+    if (ficha) {
+      this.peso = ficha.pesoSugerido;
+      this.cuentaParaNota = ficha.cuentaParaNota;
+    }
   }
 
   elegirCurso(cursoId: string): void {
@@ -578,6 +638,9 @@ export class ConsolaExamenesPage implements OnInit {
         minutosLimite: this.minutosLimite,
         intentosPermitidos: this.intentos,
         aleatorizar: this.aleatorizar,
+        tipo: this.tipoExamen(),
+        peso: this.peso,
+        cuentaParaNota: this.cuentaParaNota,
       })
       .subscribe({
         next: (examen) => {

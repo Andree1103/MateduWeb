@@ -2,8 +2,9 @@ import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AvisoEnviado, PlantillaAviso } from '../../core/api/api.models';
+import { AvisoEnviado, PlantillaAviso, PruebaDeCorreo } from '../../core/api/api.models';
 import { MateduApi } from '../../core/api/matedu.api';
+import { AuthService } from '../../core/auth/auth.service';
 
 /**
  * Avisos automaticos: que se manda y con que texto.
@@ -112,6 +113,47 @@ import { MateduApi } from '../../core/api/matedu.api';
       }
     </div>
 
+    <section class="prueba tarjeta">
+      <h2 class="seccion">Probar el envio</h2>
+      <p class="tenue">
+        Manda a una direccion suya el aviso que tenga elegido arriba, con datos de
+        ejemplo. Sirve para comprobar que el servidor de correo esta bien configurado
+        antes de que un alumno se quede sin recibir el suyo.
+      </p>
+
+      <div class="linea">
+        <label>
+          <span>Enviar a</span>
+          <input type="email" [(ngModel)]="destinoPrueba" name="destinoPrueba" />
+        </label>
+        <button
+          type="button"
+          class="boton"
+          [disabled]="probando() || !destinoPrueba"
+          (click)="probar()"
+        >
+          {{ probando() ? 'Enviando…' : 'Enviar correo de prueba' }}
+        </button>
+      </div>
+
+      @if (canal(); as porDonde) {
+        <p class="tenue nota">Saliendo por: <strong>{{ porDonde }}</strong></p>
+      }
+
+      @if (resultado(); as fin) {
+        @if (fin.enviado) {
+          <p class="resultado bien">
+            Salio hacia {{ destinoPrueba }}. Si no llega, revise la carpeta de spam:
+            el correo salio del servidor, lo que falta es que el destino lo acepte.
+          </p>
+        } @else {
+          <p class="resultado mal" role="alert">
+            El servidor lo rechazo: {{ fin.error }}
+          </p>
+        }
+      }
+    </section>
+
     <section>
       <h2 class="seccion">Ultimos avisos enviados</h2>
       @if (enviados().length === 0) {
@@ -153,6 +195,44 @@ import { MateduApi } from '../../core/api/matedu.api';
   styles: `
     .titulo {
       margin-bottom: 22px;
+    }
+    .prueba {
+      margin-top: 26px;
+      padding: 18px 20px;
+    }
+    .prueba .seccion {
+      margin-top: 0;
+    }
+    .prueba .linea {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .prueba .linea label {
+      flex: 1 1 260px;
+      max-width: 360px;
+    }
+    /* El .nota general sube 6px para pegarse a su campo; aqui va debajo de una
+       fila completa y ese tiro hacia arriba lo montaba sobre el input. */
+    .prueba .nota {
+      margin: 12px 0 0;
+    }
+    .resultado {
+      margin: 14px 0 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .resultado.bien {
+      background: var(--marca-primario-suave);
+      color: var(--marca-primario);
+    }
+    .resultado.mal {
+      background: rgba(220, 80, 80, 0.12);
+      color: #e07070;
     }
     .titulo h1 {
       font-size: 27px;
@@ -325,6 +405,7 @@ import { MateduApi } from '../../core/api/matedu.api';
 export class ConsolaAvisosPage implements OnInit {
   private readonly api = inject(MateduApi);
   private readonly sanitizador = inject(DomSanitizer);
+  private readonly auth = inject(AuthService);
 
   readonly plantillas = signal<PlantillaAviso[]>([]);
   readonly elegida = signal<PlantillaAviso | null>(null);
@@ -333,13 +414,55 @@ export class ConsolaAvisosPage implements OnInit {
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
 
+  readonly canal = signal<string | null>(null);
+  readonly probando = signal(false);
+  readonly resultado = signal<PruebaDeCorreo | null>(null);
+
   asunto = '';
   cuerpo = '';
   activa = true;
 
+  // Se propone la direccion del propio administrador: probar el correo
+  // mandandoselo a un alumno de verdad seria justo lo que no hay que hacer.
+  destinoPrueba = this.auth.usuario()?.email ?? '';
+
   ngOnInit(): void {
     this.cargarPlantillas();
     this.cargarEnviados();
+    this.api.estadoDelCorreo().subscribe({
+      next: (estado) => this.canal.set(estado.enviador),
+      error: () => this.canal.set(null),
+    });
+  }
+
+  /**
+   * Manda el aviso elegido a la direccion escrita.
+   *
+   * Un rechazo del servidor NO es un error de la pantalla: llega como respuesta
+   * normal con su motivo, y ese motivo es lo unico que permite corregir el
+   * usuario, la clave o el puerto. Por eso se muestra tal cual.
+   */
+  probar(): void {
+    const destino = this.destinoPrueba.trim();
+    if (!destino) {
+      return;
+    }
+
+    this.probando.set(true);
+    this.resultado.set(null);
+
+    this.api.enviarCorreoDePrueba(destino, this.elegida()?.tipo).subscribe({
+      next: (fin) => {
+        this.resultado.set(fin);
+        this.canal.set(fin.enviador);
+        this.probando.set(false);
+        this.cargarEnviados();
+      },
+      error: () => {
+        this.error.set('No se pudo mandar el correo de prueba.');
+        this.probando.set(false);
+      },
+    });
   }
 
   elegir(plantilla: PlantillaAviso): void {

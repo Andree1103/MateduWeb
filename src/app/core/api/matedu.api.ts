@@ -34,6 +34,8 @@ import {
   SitioPublico,
   VerificacionCertificado,
   AvisoEnviado,
+  EstadoDeCorreo,
+  PruebaDeCorreo,
   ExportacionResumen,
   FiltrosReporte,
   PlantillaAviso,
@@ -71,6 +73,11 @@ import {
   EstadoMatricula,
   MarcaCentroVista,
   MatriculaEnGrupo,
+  CrearAlumno,
+  CrearCurso,
+  TipoExamenDisponible,
+  DatosDeInscripcion,
+  InscripcionHecha,
 } from './api.models';
 
 /**
@@ -85,10 +92,24 @@ export class MateduApi {
   private readonly http = inject(HttpClient);
 
   /**
-   * Vacio en el navegador, absoluto en el servidor: es lo que permite que el
-   * renderizado del servidor pueda llamar a la API.
+   * Donde vive la API.
+   *
+   * En local, `environment.apiUrl` es la ruta relativa `/api`: en el navegador
+   * resuelve contra el propio origen y el proxy hace el resto, y en el
+   * renderizado del servidor se le antepone URL_BASE_API, que ahi si es
+   * absoluta —el servidor no tiene origen contra el que resolver una ruta
+   * relativa, y sin eso la pagina se entrega vacia.
+   *
+   * En dev, `apiUrl` YA es absoluta (el tunel). Anteponerle nada la
+   * convertiria en una direccion imposible del tipo
+   * `http://localhost:8080https://algo.trycloudflare.com/api`, asi que en ese
+   * caso se usa tal cual.
    */
-  private readonly base = inject(URL_BASE_API) + environment.apiUrl;
+  private readonly base = MateduApi.componer(inject(URL_BASE_API), environment.apiUrl);
+
+  private static componer(base: string, api: string): string {
+    return /^https?:\/\//i.test(api) ? api : base + api;
+  }
 
   cursos(buscar?: string, pagina = 0, tamano = 20): Observable<Pagina<CursoResumen>> {
     let parametros = new HttpParams().set('page', pagina).set('size', tamano);
@@ -360,6 +381,16 @@ export class MateduApi {
     return this.http.get<SitioPublico>(`${this.base}/publico/sitio`);
   }
 
+  /**
+   * Inscripcion desde el sitio publico. No requiere sesion.
+   *
+   * Devuelve una orden de pago, no un acceso: la matricula queda preinscrita
+   * hasta que el alumno pague.
+   */
+  inscribirmeEnGrupo(datos: DatosDeInscripcion): Observable<InscripcionHecha> {
+    return this.http.post<InscripcionHecha>(`${this.base}/publico/inscripcion`, datos);
+  }
+
   catalogoPublico(): Observable<CursoPublico[]> {
     return this.http.get<CursoPublico[]>(`${this.base}/publico/catalogo`);
   }
@@ -416,6 +447,24 @@ export class MateduApi {
   avisosEnviados(cuantos = 50): Observable<AvisoEnviado[]> {
     return this.http.get<AvisoEnviado[]>(`${this.base}/notificaciones`, {
       params: new HttpParams().set('cuantas', cuantos),
+    });
+  }
+
+  /** Por donde salen los correos: el log o un servidor de verdad. */
+  estadoDelCorreo(): Observable<EstadoDeCorreo> {
+    return this.http.get<EstadoDeCorreo>(`${this.base}/notificaciones/estado`);
+  }
+
+  /**
+   * Manda un aviso de muestra a una direccion, ahora mismo.
+   *
+   * Devuelve 200 tambien cuando el servidor lo rechaza: el motivo viene en
+   * `error`, que es justo lo que hay que leer para corregir la configuracion.
+   */
+  enviarCorreoDePrueba(destinatario: string, tipo?: TipoAviso): Observable<PruebaDeCorreo> {
+    return this.http.post<PruebaDeCorreo>(`${this.base}/notificaciones/prueba`, {
+      destinatario,
+      tipo: tipo ?? null,
     });
   }
 
@@ -498,6 +547,26 @@ export class MateduApi {
     return this.http.post<SuscripcionVista>(`${this.base}/suscripcion/plan`, null, {
       params: new HttpParams().set('plan', plan).set('periodo', periodo),
     });
+  }
+
+  // -------------------------------------------- crear cursos y alumnos
+
+  crearCurso(datos: CrearCurso): Observable<CursoResumen> {
+    return this.http.post<CursoResumen>(`${this.base}/cursos`, datos);
+  }
+
+  publicarCurso(cursoId: string, publicado: boolean): Observable<CursoResumen> {
+    return this.http.patch<CursoResumen>(`${this.base}/cursos/${cursoId}/publicacion`, null, {
+      params: new HttpParams().set('publicado', publicado),
+    });
+  }
+
+  crearAlumno(datos: CrearAlumno): Observable<AlumnoResumen> {
+    return this.http.post<AlumnoResumen>(`${this.base}/alumnos`, datos);
+  }
+
+  tiposDeExamen(): Observable<TipoExamenDisponible[]> {
+    return this.http.get<TipoExamenDisponible[]>(`${this.base}/examenes/tipos`);
   }
 
   // ------------------------------------------ marca y dominio del centro

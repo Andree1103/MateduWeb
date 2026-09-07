@@ -5,9 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "watch": "ng build --watch --configuration local",
     "test": "ng test",
-    "serve:ssr:web": "node dist/web/server/server.mjs"
+    "serve:ssr:web": "node dist/web/server/server.mjs",
+    "start:dev": "ng serve --configuration dev",
+    "build:dev": "ng build --configuration dev"
   },
   "prettier": {
     "printWidth": 100,

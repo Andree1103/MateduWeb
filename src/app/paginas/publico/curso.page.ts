@@ -86,7 +86,13 @@ import { MateduApi } from '../../core/api/matedu.api';
                   }
                   <p class="precio">{{ precio(grupo) }}</p>
                   <p class="vacantes tenue">{{ grupo.vacantes }} vacantes</p>
-                  <a class="boton" routerLink="/ingresar">Matricularme</a>
+                  @if (grupo.vacantes > 0) {
+                    <a class="boton" [routerLink]="['/cursos', c.slug, 'inscribirme', grupo.id]">
+                      Inscribirme
+                    </a>
+                  } @else {
+                    <span class="tenue sin-cupo">Sin vacantes</span>
+                  }
                 </div>
               }
             }
@@ -178,6 +184,9 @@ import { MateduApi } from '../../core/api/matedu.api';
       font-weight: 700;
       color: var(--marca-primario);
       margin-top: 10px !important;
+    }
+    .sin-cupo {
+      font-size: 13px;
     }
     .vacantes {
       margin-bottom: 12px !important;

@@ -35,6 +35,13 @@ export const routes: Routes = [
           import('./paginas/publico/curso.page').then((m) => m.CursoPublicoPage),
       },
       {
+        // Inscripcion publica: reserva la vacante y emite la orden de pago.
+        // La matricula queda PREINSCRITO, que no abre el aula.
+        path: 'cursos/:slug/inscribirme/:grupoId',
+        loadComponent: () =>
+          import('./paginas/publico/inscribirme.page').then((m) => m.InscribirmePage),
+      },
+      {
         path: 'p/:slug',
         loadComponent: () =>
           import('./paginas/publico/pagina.page').then((m) => m.PaginaPublicaPage),

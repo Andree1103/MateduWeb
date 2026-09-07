@@ -1,165 +1,212 @@
+/* Armazon de la consola.
+
+   Barra oscura arriba a todo lo ancho, rail claro a la izquierda, contenido
+   a la derecha. Es la disposicion de cualquier consola de administracion
+   seria, y no por moda: la franja oscura enmarca la aplicacion y la separa
+   del navegador, el rail deja las secciones siempre a la vista, y el area
+   de trabajo se queda con todo el ancho util. */
+
 :host {
   display: block;
   height: 100%;
 }
 
 .consola {
-  display: grid;
-  grid-template-columns: 232px 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-/* ------------------------------------------------------------ lateral */
+/* -------------------------------------------------------- barra superior */
 
-.barra-lateral {
+.barra-superior {
   display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding: 20px 14px;
-  background: var(--superficie);
-  border-right: 1px solid var(--linea);
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 14px;
+  background: var(--barra);
+  color: var(--barra-texto);
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
 .marca {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px;
+  gap: 9px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.marca:hover {
+  text-decoration: none;
 }
 
 .marca-punto {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: var(--marca-primario);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 .marca-nombre {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.navegacion {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-
-.enlace {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  font-size: 14.5px;
-  color: var(--texto-2);
-  text-decoration: none;
-  border-radius: var(--radio-sm);
-}
-
-.enlace:hover {
-  background: var(--superficie-2);
-  color: var(--texto);
-}
-
-.enlace.activo {
-  color: var(--marca-primario);
-  background: var(--marca-primario-suave);
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.icono {
-  width: 18px;
-  text-align: center;
-  opacity: 0.75;
+.barra-separador {
+  width: 1px;
+  height: 18px;
+  background: var(--barra-2);
 }
 
-.pie-lateral {
-  padding: 0 10px;
-  font-size: 12.5px;
-}
-
-.pie-lateral p {
-  margin: 6px 0 0;
-}
-
-/* ------------------------------------------------------------- area */
-
-.area {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.cabecera {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 24px;
-  background: var(--superficie);
-  border-bottom: 1px solid var(--linea);
-}
-
-.cabecera-titulo {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-
-.cabecera-titulo span {
+.barra-seccion {
   font-size: 13px;
+  color: var(--barra-tenue);
 }
 
-.boton-menu {
-  display: none;
-  padding: 6px 10px;
-  font-size: 16px;
-  color: var(--texto-2);
-  background: transparent;
-  border: 1px solid var(--linea);
-  border-radius: var(--radio-sm);
-  cursor: pointer;
-}
-
-.usuario {
+.barra-derecha {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--marca-primario);
-  border-radius: 50%;
+  margin-left: auto;
 }
 
 .usuario-datos {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  align-items: flex-end;
+  line-height: 1.2;
 }
 
 .usuario-datos strong {
-  font-size: 13.5px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 .usuario-datos small {
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--barra-tenue);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--marca-primario);
+  border-radius: 2px;
+}
+
+.salir {
+  padding: 4px 11px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--barra-texto);
+  background: transparent;
+  border: 1px solid var(--barra-2);
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+}
+
+.salir:hover {
+  background: var(--barra-2);
+}
+
+.boton-menu {
+  display: none;
+  padding: 4px 8px;
+  font-size: 15px;
+  color: var(--barra-texto);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- cuerpo */
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.barra-lateral {
+  display: flex;
+  flex-direction: column;
+  background: var(--superficie);
+  border-right: 1px solid var(--linea);
+}
+
+.navegacion {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  flex: 1;
+}
+
+.bloque + .bloque {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--linea-2);
+}
+
+.bloque-titulo {
+  margin: 0 0 4px;
+  padding: 0 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+/* El activo se marca con una barra de 3px a la izquierda, no con una
+   pastilla de color: senala la posicion en la lista sin repintar la fila,
+   que es lo que hace legible un menu de doce entradas. */
+.enlace {
+  display: block;
+  padding: 6px 14px;
+  font-size: 13.5px;
+  color: var(--texto-2);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+
+.enlace:hover {
+  background: var(--superficie-2);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.enlace.activo {
+  color: var(--texto);
+  background: var(--superficie-2);
+  border-left-color: var(--marca-primario);
+  font-weight: 600;
+}
+
+.pie-lateral {
+  padding: 12px 14px;
+  border-top: 1px solid var(--linea-2);
+}
+
+.pie-lateral p {
+  margin: 0;
+  font-size: 11.5px;
 }
 
 .contenido {
-  flex: 1;
-  padding: 28px 24px 56px;
+  padding: 22px 24px 48px;
   min-width: 0;
 }
 
@@ -170,43 +217,46 @@
 /* -------------------------------------------------------- responsive */
 
 @media (max-width: 860px) {
-  .consola {
+  .cuerpo {
     grid-template-columns: 1fr;
   }
 
   .barra-lateral {
     position: fixed;
-    inset: 0 auto 0 0;
+    inset: 46px auto 0 0;
     z-index: 20;
-    width: 232px;
+    width: 216px;
     transform: translateX(-100%);
-    transition: transform 0.18s ease;
+    transition: transform 0.16s ease;
   }
 
   .consola.menu-abierto .barra-lateral {
     transform: translateX(0);
+    box-shadow: var(--sombra-alta);
   }
 
   .boton-menu {
     display: block;
   }
 
-  .usuario-datos {
+  .usuario-datos,
+  .barra-separador,
+  .barra-seccion {
     display: none;
   }
 
   .consola.menu-abierto .velo {
     display: block;
     position: fixed;
-    inset: 0;
+    inset: 46px 0 0 0;
     z-index: 10;
     padding: 0;
-    background: rgba(10, 16, 22, 0.45);
+    background: rgba(20, 18, 15, 0.4);
     border: 0;
     cursor: pointer;
   }
 
   .contenido {
-    padding: 20px 16px 48px;
+    padding: 16px 14px 40px;
   }
 }

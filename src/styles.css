@@ -1,60 +1,85 @@
 /* =====================================================================
-   MATEDU · estilos base
-   Todo el color pasa por variables. En la fase 6, cuando cada centro traiga
-   su propia marca, solo cambia --marca-primario y la interfaz entera se
-   adapta sin tocar componentes.
+   MATEDU · sistema visual
+
+   La referencia es una consola de administracion de verdad (Oracle Cloud,
+   AWS, Azure): densa, plana y sobria. Un centro de capacitacion pasa horas
+   aqui gestionando matriculas y cobranza; lo que necesita es ver muchos
+   datos de un vistazo y confiar en lo que ve, no una pagina de aterrizaje.
+
+   De ahi las decisiones que se repiten en todo el archivo:
+
+     - Esquinas de 3px, no de 12. Las esquinas muy redondeadas son de
+       aplicacion de consumo; en una tabla de cobranza se ven infantiles.
+     - Sin sombras en las tarjetas: separan con una linea de 1px. Las
+       sombras apiladas ensucian una pantalla con veinte bloques.
+     - Sin degradados ni colores de acento decorativos. El color se gasta
+       en lo que significa algo: el estado de un pago, un boton primario.
+     - Tipografia de 14px con jerarquia corta. Los titulos enormes gastan
+       una pantalla que aqui vale para mostrar filas.
+
+   Todo el color pasa por variables: cuando un centro trae su marca,
+   MarcaService sobrescribe --marca-primario y la interfaz entera se adapta
+   sin tocar un solo componente.
    ===================================================================== */
 
 :root {
   /* Color del centro. MarcaService lo sobrescribe en tiempo de ejecucion. */
   --marca-primario: #0e6e76;
-  --marca-primario-suave: rgba(14, 110, 118, 0.12);
+  --marca-primario-suave: rgba(14, 110, 118, 0.1);
+  --marca-primario-oscuro: #0a565c;
 
-  /* Superficies y texto */
-  --fondo: #eff2f4;
+  /* Superficies. Grises calidos, no azulados: cansan menos en jornadas
+     largas y no compiten con el color de marca del centro. */
+  --fondo: #f1f0ee;
   --superficie: #ffffff;
-  --superficie-2: #f7f9fa;
-  --texto: #14202c;
-  --texto-2: #3c4c5c;
-  --texto-tenue: #6a7a8a;
-  --linea: #d9e1e7;
-  --linea-2: #e9eef1;
+  --superficie-2: #f7f6f4;
+  --superficie-3: #eceae6;
 
-  /* Semanticos */
-  --exito: #2c8a68;
-  --aviso: #b0702a;
-  --error: #b3382f;
-  --error-suave: #fdecea;
+  --texto: #1b1a17;
+  --texto-2: #4a4741;
+  --texto-tenue: #75726b;
 
-  --sombra: 0 1px 2px rgba(20, 32, 44, 0.05), 0 8px 24px -14px rgba(20, 32, 44, 0.22);
-  --radio: 8px;
-  --radio-sm: 5px;
+  --linea: #d5d2cc;
+  --linea-2: #e7e4df;
 
-  --fuente: 'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;
-  --fuente-mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  /* La barra superior, oscura, hace de marco: separa la aplicacion del
+     navegador y ancla la vista sin robar atencion. */
+  --barra: #2c2a26;
+  --barra-2: #3b3833;
+  --barra-texto: #f3f2f0;
+  --barra-tenue: #b4afa6;
 
-  color-scheme: light dark;
+  /* Semanticos. Apagados a proposito: en una lista de treinta filas, un
+     verde brillante grita mas que la informacion. */
+  --exito: #1c6b46;
+  --exito-suave: #e6f2ec;
+  --aviso: #8a5a12;
+  --aviso-suave: #fbf1de;
+  --error: #a3312a;
+  --error-suave: #fbeceb;
+  --neutro-suave: #eceae6;
+
+  /* Solo para lo que flota: menus, dialogos. Las tarjetas no llevan. */
+  --sombra: 0 2px 6px rgba(20, 18, 15, 0.14);
+  --sombra-alta: 0 8px 28px rgba(20, 18, 15, 0.18);
+
+  --radio: 3px;
+  --radio-sm: 2px;
+
+  --fuente:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --fuente-mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fondo: #0e151c;
-    --superficie: #161f29;
-    --superficie-2: #1b2631;
-    --texto: #e6ecf1;
-    --texto-2: #b9c6d2;
-    --texto-tenue: #8496a6;
-    --linea: #2a3846;
-    --linea-2: #222e3a;
+/* Sin tema oscuro automatico.
 
-    --exito: #4cbb92;
-    --aviso: #e29a48;
-    --error: #e0736a;
-    --error-suave: #2c1a18;
-
-    --sombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -16px rgba(0, 0, 0, 0.7);
-  }
-}
+   Lo habia antes y hacia que la consola cambiara de aspecto segun el
+   sistema operativo de quien la abriera: el mismo centro veia dos
+   productos distintos, y las capturas para soporte no coincidian con lo
+   que el usuario tenia delante. Si algun dia hay tema oscuro, sera una
+   preferencia guardada del usuario, no una adivinanza del navegador. */
 
 * {
   box-sizing: border-box;
@@ -70,22 +95,45 @@ body {
   background: var(--fondo);
   color: var(--texto);
   font-family: var(--fuente);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   margin: 0;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+h1 {
+  font-size: 21px;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 14px;
 }
 
 a {
   color: var(--marca-primario);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+small {
+  font-size: 12px;
 }
 
 /* --------------------------------------------------------------- controles */
@@ -93,77 +141,143 @@ a {
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.campo label {
-  font-size: 12.5px;
+.campo label,
+.campo > span:first-child {
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--texto-2);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .campo input,
-.campo select {
+.campo select,
+.campo textarea,
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='date'],
+input[type='url'],
+input[type='search'],
+select,
+textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 6px 9px;
   font: inherit;
-  font-size: 14.5px;
+  font-size: 13.5px;
   color: var(--texto);
   background: var(--superficie);
-  border: 1px solid var(--linea);
+  border: 1px solid #b9b5ae;
   border-radius: var(--radio-sm);
 }
 
-.campo input:focus,
-.campo select:focus {
+textarea {
+  line-height: 1.5;
+  resize: vertical;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: #918d86;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--marca-primario);
-  box-shadow: 0 0 0 3px var(--marca-primario-suave);
+  box-shadow: 0 0 0 2px var(--marca-primario-suave);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: var(--texto-tenue);
+  background: var(--superficie-2);
+  border-color: var(--linea);
+}
+
+input[type='color'] {
+  width: 46px;
+  height: 30px;
+  padding: 2px;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  accent-color: var(--marca-primario);
 }
 
 .campo .ayuda {
-  font-size: 12px;
+  font-size: 11.5px;
+  font-weight: 400;
   color: var(--texto-tenue);
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .campo .error-campo {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--error);
+  letter-spacing: 0;
+  text-transform: none;
 }
+
+/* ------------------------------------------------------------------ botones */
 
 .boton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
+  gap: 7px;
+  padding: 6px 14px;
   font: inherit;
-  font-size: 14.5px;
+  font-size: 13px;
   font-weight: 600;
   color: #fff;
   background: var(--marca-primario);
-  border: 1px solid transparent;
+  border: 1px solid var(--marca-primario);
   border-radius: var(--radio-sm);
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.boton:hover:not(:disabled) {
+  background: var(--marca-primario-oscuro);
+  border-color: var(--marca-primario-oscuro);
 }
 
 .boton:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .boton-secundario {
   color: var(--texto-2);
-  background: transparent;
-  border-color: var(--linea);
+  background: var(--superficie);
+  border-color: #b9b5ae;
+}
+
+.boton-secundario:hover:not(:disabled) {
+  color: var(--texto);
+  background: var(--superficie-2);
+  border-color: #918d86;
 }
 
 .boton:focus-visible,
 a:focus-visible,
-button:focus-visible {
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--marca-primario);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 /* ----------------------------------------------------------------- bloques */
@@ -172,31 +286,81 @@ button:focus-visible {
   background: var(--superficie);
   border: 1px solid var(--linea);
   border-radius: var(--radio);
-  box-shadow: var(--sombra);
 }
 
 .aviso-error {
-  padding: 10px 14px;
-  font-size: 14px;
+  padding: 9px 12px;
+  font-size: 13px;
   color: var(--error);
   background: var(--error-suave);
-  border: 1px solid var(--error);
+  border: 1px solid #e6bcb8;
+  border-left: 3px solid var(--error);
   border-radius: var(--radio-sm);
 }
 
+/* Distintivo pequeno: estados, fases, cualquier dato de una palabra.
+   Rectangular y en mayusculas; la pastilla redonda con color pastel es
+   justo lo que hace que una herramienta de gestion parezca un juguete. */
 .etiqueta {
   display: inline-block;
-  padding: 2px 9px;
-  font-family: var(--fuente-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--marca-primario);
-  background: var(--marca-primario-suave);
-  border-radius: 99px;
+  padding: 1px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+  background: var(--neutro-suave);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-sm);
+  white-space: nowrap;
 }
 
 .tenue {
   color: var(--texto-tenue);
+}
+
+.mono {
+  font-family: var(--fuente-mono);
+  font-size: 12.5px;
+}
+
+/* Tablas: cabecera en gris, filas separadas por una linea fina y nada mas.
+   Las tablas cebra se leen peor cuando hay que seguir una fila larga. */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  padding: 7px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--texto-2);
+  background: var(--superficie-2);
+  border-bottom: 1px solid var(--linea);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--linea-2);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover td {
+  background: var(--superficie-2);
+}
+
+.tabla-scroll {
+  overflow-x: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

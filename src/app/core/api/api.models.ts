@@ -599,6 +599,18 @@ export interface AvisoEnviado {
   enviadoEn: string | null;
 }
 
+/** Por donde estan saliendo los correos ahora mismo. */
+export interface EstadoDeCorreo {
+  enviador: string;
+}
+
+/** Resultado de un envio de prueba, con el motivo si el servidor lo rechazo. */
+export interface PruebaDeCorreo {
+  enviado: boolean;
+  enviador: string;
+  error: string | null;
+}
+
 export type TipoReporte = 'MATRICULAS' | 'NOTAS' | 'ASISTENCIA' | 'COBRANZA' | 'INGRESOS';
 
 export interface ReporteDisponible {
@@ -877,6 +889,10 @@ export interface ExamenResumen {
   peso: number;
   publicado: boolean;
   totalPreguntas: number;
+  tipo: TipoExamen;
+  tipoEtiqueta: string;
+  /** false = no entra en el promedio del curso. */
+  cuentaParaNota: boolean;
 }
 
 export interface CrearExamen {
@@ -889,6 +905,8 @@ export interface CrearExamen {
   peso?: number | null;
   aleatorizar?: boolean | null;
   mostrarResultado?: boolean | null;
+  tipo?: TipoExamen | null;
+  cuentaParaNota?: boolean | null;
 }
 
 // --------------------------------------------- boton de pago de Niubiz
@@ -994,4 +1012,65 @@ export interface MatriculaEnGrupo {
   moneda: string;
   notaFinal: number | null;
   aprobado: boolean | null;
+}
+
+// ---------------------------------------------- tipos de examen (fase 4+)
+
+export type TipoExamen = 'PRACTICA' | 'TEST' | 'PARCIAL' | 'FINAL' | 'RECUPERACION';
+
+export interface TipoExamenDisponible {
+  tipo: TipoExamen;
+  etiqueta: string;
+  /** Peso que trae por defecto dentro del componente de examenes. */
+  pesoSugerido: number;
+  cuentaParaNota: boolean;
+}
+
+export interface CrearCurso {
+  codigo: string;
+  nombre: string;
+  sumilla?: string | null;
+  temario?: string | null;
+  requisitos?: string | null;
+  dirigidoA?: string | null;
+  horasAcademicas?: number | null;
+  precioBase?: number | null;
+  notaMinima?: number | null;
+  asistenciaMinima?: number | null;
+  certificable?: boolean | null;
+}
+
+export interface CrearAlumno {
+  nombres: string;
+  apellidos: string;
+  numeroDocumento?: string | null;
+  email?: string | null;
+  telefono?: string | null;
+  empresa?: string | null;
+}
+
+// ------------------------------------------- inscripcion publica del alumno
+
+export interface DatosDeInscripcion {
+  grupoId: string;
+  nombres: string;
+  apellidos: string;
+  numeroDocumento?: string | null;
+  email: string;
+  telefono?: string | null;
+  password: string;
+}
+
+export interface InscripcionHecha {
+  matriculaId: string;
+  ordenId: string;
+  numeroOrden: string;
+  total: number;
+  moneda: string;
+  curso: string;
+  grupo: string;
+  email: string;
+  /** false = ese correo ya tenia cuenta; entra con su contrasena de siempre. */
+  cuentaNueva: boolean;
+  urlAula: string;
 }

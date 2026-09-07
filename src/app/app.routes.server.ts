@@ -19,6 +19,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server },
   { path: 'cursos', renderMode: RenderMode.Server },
   { path: 'cursos/:slug', renderMode: RenderMode.Server },
+  // El formulario es interactivo y lleva datos personales: cliente.
+  { path: 'cursos/:slug/inscribirme/:grupoId', renderMode: RenderMode.Client },
   { path: 'p/:slug', renderMode: RenderMode.Server },
 
   { path: 'registro', renderMode: RenderMode.Server },
