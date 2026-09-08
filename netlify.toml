@@ -1,0 +1,49 @@
+# =====================================================================
+# MATEDU  |  Despliegue en Netlify
+#
+# Lo que hay en este archivo manda sobre lo que este configurado en el
+# panel de Netlify. Se pone aqui a proposito: asi la configuracion del
+# despliegue viaja con el codigo y no depende de que alguien recuerde
+# como estaba puesta una casilla en una pantalla web.
+# =====================================================================
+
+[build]
+  # dist/web/browser, no dist.
+  #
+  # La aplicacion se compila con renderizado en servidor (outputMode:
+  # server), asi que el build deja DOS carpetas: 'browser' con lo que
+  # descarga el navegador y 'server' con el renderizador. Netlify publica
+  # la primera y convierte la segunda en una funcion; apuntarle a 'dist'
+  # a secas es el error que aborta el despliegue.
+  publish = "dist/web/browser"
+
+  # build:demo, no build ni build:dev.
+  #
+  #   build       compila para produccion, donde la aplicacion llama a
+  #               '/api': una ruta relativa contra su propio dominio.
+  #               Aqui no hay nada en /api, asi que no funcionaria.
+  #   build:dev   apunta al tunel, pero SIN optimizar y con los mapas de
+  #               codigo dentro: es para 'ng serve', no para publicar.
+  #   build:demo  apunta al tunel Y compila como produccion. Es este.
+  command = "npm run build:demo"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# ---------------------------------------------------------------------
+# ATENCION al desplegar contra un tunel rapido
+#
+# La direccion del tunel vive en src/environments/environment.dev.ts y
+# CAMBIA cada vez que se levanta el tunel. Netlify compila desde lo que
+# hay en el repositorio, no desde su maquina: si levanta el tunel y no
+# commitea ese archivo, el sitio publicado seguira hablandole a una
+# direccion que ya no existe.
+#
+# Es decir, cada vez:
+#   .\tunel.ps1                     (en MateduBack, escribe la direccion)
+#   git commit -am "nueva direccion del tunel"
+#   git push                        (Netlify reconstruye solo)
+#
+# Y mientras el tunel este cerrado, el sitio no tendra API. Para algo que
+# dure hace falta un tunel con nombre y un subdominio propio.
+# ---------------------------------------------------------------------
