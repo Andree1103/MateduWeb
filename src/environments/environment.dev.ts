@@ -18,4 +18,17 @@ export const environment = {
   entorno: 'dev',
   apiUrl: 'https://equal-retail-advisors-pittsburgh.trycloudflare.com/api',
   enviarCabeceraCentro: true,
+
+  /**
+   * Centro que se asume cuando NO hay sesion.
+   *
+   * Las paginas publicas —el catalogo, la ficha de un curso, la
+   * inscripcion— las abre un visitante sin cuenta, asi que no hay centro
+   * guardado que mandar. En produccion no hace falta: el centro se deduce
+   * del dominio desde el que se sirve la pagina. Aqui no hay tal dominio
+   * (localhost, o el de Netlify), asi que se declara.
+   *
+   * Es el centro que se ve en matedu.netlify.app.
+   */
+  centroPorDefecto: 'andina',
 };

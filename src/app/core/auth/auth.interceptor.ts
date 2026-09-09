@@ -68,8 +68,14 @@ function agregarCabeceras(
   }
 
   // En produccion el centro se resuelve por el dominio y esta cabecera sobra.
-  if (environment.enviarCabeceraCentro && store.centro) {
-    cabeceras['X-Tenant'] = store.centro;
+  //
+  // El centro de la sesion manda; si no hay sesion se usa el declarado en el
+  // entorno. Sin ese respaldo, las paginas publicas —catalogo, ficha de
+  // curso, inscripcion— fallan con "No se pudo determinar el centro": las
+  // abre alguien que todavia no ha entrado, asi que no hay nada guardado.
+  const centro = store.centro || environment.centroPorDefecto;
+  if (environment.enviarCabeceraCentro && centro) {
+    cabeceras['X-Tenant'] = centro;
   }
 
   return Object.keys(cabeceras).length > 0
