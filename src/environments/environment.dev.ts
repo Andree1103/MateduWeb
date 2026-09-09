@@ -16,6 +16,6 @@
 export const environment = {
   produccion: false,
   entorno: 'dev',
-  apiUrl: 'https://college-paperback-reads-qualify.trycloudflare.com/api',
+  apiUrl: 'https://equal-retail-advisors-pittsburgh.trycloudflare.com/api',
   enviarCabeceraCentro: true,
 };
