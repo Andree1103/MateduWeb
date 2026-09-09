@@ -30,6 +30,21 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# El plugin de Angular, declarado aqui y NO desde el panel de Netlify.
+#
+# Instalado desde el panel, el plugin vive fuera del repositorio y no se
+# encuentra a si mismo cuando comprueba la version que exige @angular/ssr.
+# El resultado es un error que engaña:
+#
+#   @angular/ssr@20.3.35 requires '@netlify/angular-runtime@^4.0.0' or
+#   later to be installed
+#
+# ...estando ya instalada esa misma version. Lo que faltaba no era la
+# version, era que estuviera dentro del proyecto: por eso va tambien en
+# devDependencies del package.json.
+[[plugins]]
+  package = "@netlify/angular-runtime"
+
 # ---------------------------------------------------------------------
 # ATENCION al desplegar contra un tunel rapido
 #
