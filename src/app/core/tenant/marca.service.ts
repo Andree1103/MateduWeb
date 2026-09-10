@@ -1,5 +1,6 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { MateduApi } from '../api/matedu.api';
 
 export interface MarcaCentro {
   nombre: string;
@@ -24,9 +25,42 @@ const MARCA_POR_DEFECTO: MarcaCentro = {
 export class MarcaService {
   private readonly documento = inject(DOCUMENT);
   private readonly enNavegador = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly api = inject(MateduApi);
   private readonly _marca = signal<MarcaCentro>(MARCA_POR_DEFECTO);
 
   readonly marca = this._marca.asReadonly();
+
+  /** Para no volver a pedirla en cada navegacion. */
+  private cargada = false;
+
+  /**
+   * Trae la marca del centro y la aplica.
+   *
+   * Hasta ahora esto solo pasaba en el sitio publico, asi que un
+   * administrador entraba a SU consola y leia "MATEDU" en la barra, con el
+   * color de MATEDU. Justo lo contrario de lo que se le vende: la
+   * plataforma se ve del centro, no nuestra.
+   *
+   * Se pide al sitio publico y no a /api/marca porque aquella ruta la puede
+   * leer cualquiera —tambien un docente o un alumno— y esta solo la gestion.
+   */
+  cargar(): void {
+    if (this.cargada || !this.enNavegador) {
+      return;
+    }
+    this.cargada = true;
+
+    this.api.sitioPublico().subscribe({
+      next: (sitio) => this.aplicar({
+        nombre: sitio.nombre,
+        colorPrimario: sitio.colorPrimario,
+        logoUrl: sitio.logoUrl,
+      }),
+      // Sin marca la aplicacion funciona igual, con la de fabrica. No hay
+      // nada que avisarle al usuario.
+      error: () => { this.cargada = false; },
+    });
+  }
 
   aplicar(marca: Partial<MarcaCentro>): void {
     const combinada = { ...this._marca(), ...marca };

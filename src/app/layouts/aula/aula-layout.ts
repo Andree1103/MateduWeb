@@ -24,6 +24,12 @@ export class AulaLayout {
   protected readonly iniciales = this.auth.iniciales;
   protected readonly marca = this.marcaService.marca;
 
+  constructor() {
+    // El centro se ve con su nombre y su color tambien aqui dentro, no solo
+    // en su sitio publico.
+    this.marcaService.cargar();
+  }
+
   protected salir(): void {
     this.auth.cerrarSesion();
   }
