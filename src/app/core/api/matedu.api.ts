@@ -34,6 +34,12 @@ import {
   SitioPublico,
   VerificacionCertificado,
   AvisoEnviado,
+  AvanceTarea,
+  CrearTarea,
+  EntregaDetalle,
+  EntregaParaCalificar,
+  TareaDelAlumno,
+  TareaResumen,
   EstadoDeCorreo,
   PruebaDeCorreo,
   ExportacionResumen,
@@ -466,6 +472,107 @@ export class MateduApi {
       destinatario,
       tipo: tipo ?? null,
     });
+  }
+
+  // ---------------------------------------------------------------- tareas
+
+  tareasDelCurso(cursoId: string): Observable<TareaResumen[]> {
+    return this.http.get<TareaResumen[]>(`${this.base}/tareas`, {
+      params: new HttpParams().set('cursoId', cursoId),
+    });
+  }
+
+  crearTarea(datos: CrearTarea): Observable<TareaResumen> {
+    return this.http.post<TareaResumen>(`${this.base}/tareas`, datos);
+  }
+
+  editarTarea(id: string, datos: CrearTarea): Observable<TareaResumen> {
+    return this.http.put<TareaResumen>(`${this.base}/tareas/${id}`, datos);
+  }
+
+  publicarTarea(id: string, publicada: boolean): Observable<TareaResumen> {
+    return this.http.post<TareaResumen>(`${this.base}/tareas/${id}/publicacion`, null, {
+      params: new HttpParams().set('publicada', publicada),
+    });
+  }
+
+  eliminarTarea(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/tareas/${id}`);
+  }
+
+  entregasDeTarea(id: string, grupoId?: string): Observable<EntregaParaCalificar[]> {
+    let parametros = new HttpParams();
+    if (grupoId) {
+      parametros = parametros.set('grupoId', grupoId);
+    }
+    return this.http.get<EntregaParaCalificar[]>(`${this.base}/tareas/${id}/entregas`, {
+      params: parametros,
+    });
+  }
+
+  avanceDeTarea(id: string, grupoId?: string): Observable<AvanceTarea> {
+    let parametros = new HttpParams();
+    if (grupoId) {
+      parametros = parametros.set('grupoId', grupoId);
+    }
+    return this.http.get<AvanceTarea>(`${this.base}/tareas/${id}/avance`, { params: parametros });
+  }
+
+  calificarEntrega(
+    entregaId: string,
+    datos: { nota: number; retroalimentacion?: string | null },
+  ): Observable<EntregaDetalle> {
+    return this.http.post<EntregaDetalle>(
+      `${this.base}/tareas/entregas/${entregaId}/calificacion`,
+      datos,
+    );
+  }
+
+  quitarCalificacion(entregaId: string): Observable<EntregaDetalle> {
+    return this.http.delete<EntregaDetalle>(
+      `${this.base}/tareas/entregas/${entregaId}/calificacion`,
+    );
+  }
+
+  enlaceDeEntrega(entregaId: string): Observable<{ url: string; venceEn: string }> {
+    return this.http.get<{ url: string; venceEn: string }>(
+      `${this.base}/tareas/entregas/${entregaId}/archivo`,
+    );
+  }
+
+  // --------------------------------------------------- tareas, lado del alumno
+
+  /** Por grupo: es el aula que el alumno tiene abierta. */
+  misTareas(grupoId: string): Observable<TareaDelAlumno[]> {
+    return this.http.get<TareaDelAlumno[]>(`${this.base}/tareas/mias`, {
+      params: new HttpParams().set('grupoId', grupoId),
+    });
+  }
+
+  entregarTarea(
+    tareaId: string,
+    datos: { archivoId?: string | null; comentario?: string | null },
+  ): Observable<EntregaDetalle> {
+    return this.http.post<EntregaDetalle>(`${this.base}/tareas/${tareaId}/entrega`, datos);
+  }
+
+  /** Sube el archivo de la entrega. Solo se admite dentro de una tarea abierta. */
+  subirArchivoDeEntrega(
+    tareaId: string,
+    archivo: File,
+  ): Observable<{ id: string; nombre: string; tamanoBytes: number }> {
+    const cuerpo = new FormData();
+    cuerpo.append('archivo', archivo);
+    return this.http.post<{ id: string; nombre: string; tamanoBytes: number }>(
+      `${this.base}/tareas/${tareaId}/entrega/archivo`,
+      cuerpo,
+    );
+  }
+
+  miArchivoDeEntrega(tareaId: string): Observable<{ url: string; venceEn: string }> {
+    return this.http.get<{ url: string; venceEn: string }>(
+      `${this.base}/tareas/${tareaId}/entrega/archivo`,
+    );
   }
 
   // ------------------------------------------------------ reportes (fase 7)

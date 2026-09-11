@@ -108,6 +108,11 @@ export const routes: Routes = [
           import('./paginas/consola/contenido.page').then((m) => m.ConsolaContenidoPage),
       },
       {
+        path: 'tareas',
+        loadComponent: () =>
+          import('./paginas/consola/tareas.page').then((m) => m.ConsolaTareasPage),
+      },
+      {
         path: 'examenes',
         canActivate: [rolGuard('SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE')],
         loadComponent: () =>
@@ -186,6 +191,10 @@ export const routes: Routes = [
       {
         path: 'clases',
         loadComponent: () => import('./paginas/aula/agenda.page').then((m) => m.AulaAgendaPage),
+      },
+      {
+        path: 'cursos/:grupoId/tareas',
+        loadComponent: () => import('./paginas/aula/tareas.page').then((m) => m.AulaTareasPage),
       },
       {
         path: 'examenes/:examenId',

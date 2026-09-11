@@ -61,6 +61,7 @@ export class ConsolaLayout {
     { etiqueta: 'Grupos', ruta: '/consola/grupos', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
     { etiqueta: 'Alumnos', ruta: '/consola/alumnos', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
     { etiqueta: 'Evaluaciones', ruta: '/consola/examenes', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
+    { etiqueta: 'Tareas', ruta: '/consola/tareas', grupo: 'Academico', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR', 'DOCENTE'] },
 
     { etiqueta: 'Cobranza', ruta: '/consola/cobranza', grupo: 'Dinero', roles: ['SUPERADMIN', 'ADMIN_CENTRO', 'COORDINADOR'] },
     { etiqueta: 'Cobros online', ruta: '/consola/cobros', grupo: 'Dinero', roles: ['SUPERADMIN', 'ADMIN_CENTRO'] },

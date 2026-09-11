@@ -38,6 +38,15 @@ import { MateduApi } from '../../core/api/matedu.api';
         </div>
       </header>
 
+      <!-- Las tareas del curso viven aparte porque no se leen, se hacen: si
+           estuvieran mezcladas con las lecciones, el alumno las descubriria
+           bajando el temario, casi siempre despues de la fecha. -->
+      <nav class="atajos">
+        <a class="boton boton-secundario" [routerLink]="['/aula/cursos', grupoId(), 'tareas']">
+          Tareas del curso
+        </a>
+      </nav>
+
       <div class="barra-avance" [attr.aria-label]="'Avance ' + avance() + ' por ciento'">
         <span [style.width.%]="avance()"></span>
       </div>
@@ -178,6 +187,12 @@ import { MateduApi } from '../../core/api/matedu.api';
     .avance span:last-child {
       font-size: 12px;
     }
+    .atajos {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+
     .barra-avance {
       height: 6px;
       background: var(--superficie-2);

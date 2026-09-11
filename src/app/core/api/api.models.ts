@@ -565,6 +565,77 @@ export interface PaginaPublicaVista {
   metaDescripcion: string | null;
 }
 
+// ------------------------------------------------------------------ tareas
+
+export interface TareaResumen {
+  id: string;
+  cursoId: string;
+  titulo: string;
+  descripcion: string | null;
+  fechaLimite: string | null;
+  notaMaxima: number;
+  peso: number;
+  aceptaTardias: boolean;
+  publicado: boolean;
+}
+
+export interface EntregaDetalle {
+  id: string;
+  tareaId: string;
+  matriculaId: string;
+  archivoId: string | null;
+  comentario: string | null;
+  entregadoEn: string;
+  tardia: boolean;
+  nota: number | null;
+  retroalimentacion: string | null;
+  calificadoEn: string | null;
+}
+
+/** Una tarea como la ve el alumno: el enunciado y lo que el mismo entrego. */
+export interface TareaDelAlumno {
+  id: string;
+  titulo: string;
+  descripcion: string | null;
+  fechaLimite: string | null;
+  notaMaxima: number;
+  aceptaTardias: boolean;
+  vencida: boolean;
+  entrega: EntregaDetalle | null;
+}
+
+/** Una entrega como la ve el docente: con nombre, no con un identificador. */
+export interface EntregaParaCalificar {
+  id: string;
+  matriculaId: string;
+  alumno: string;
+  grupo: string;
+  archivoId: string | null;
+  comentario: string | null;
+  entregadoEn: string;
+  tardia: boolean;
+  nota: number | null;
+  retroalimentacion: string | null;
+  calificadoEn: string | null;
+}
+
+export interface AvanceTarea {
+  matriculados: number;
+  entregadas: number;
+  calificadas: number;
+  tardias: number;
+}
+
+export interface CrearTarea {
+  cursoId: string;
+  titulo: string;
+  descripcion?: string | null;
+  fechaLimite?: string | null;
+  notaMaxima?: number | null;
+  peso?: number | null;
+  aceptaTardias?: boolean | null;
+}
+
 // ------------------------------------------------------- fase 7: automatizacion
 
 export type TipoAviso =
